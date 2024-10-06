@@ -5,8 +5,11 @@ import eu.mihosoft.jcsg.Cube;
 import eu.mihosoft.jcsg.Cylinder;
 import eu.mihosoft.vvecmath.Vector3d;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.keyboard.generator.keyboard.mx.CherryMXPlateParameters.*;
 
@@ -73,14 +76,9 @@ public class CherryMXSwitchPlate {
     }
 
     private static List<CSG> getScrewHoles(Vector3d dimensions) {
-        // **Create the screw holes**
-        CSG screwHoles = null;
-        for (Vector3d positionStart : SCREW_HOLE_POSITIONS) {
-            var positionEnd = Vector3d.xyz(positionStart.x(),positionStart.y(),dimensions.z());
-            CSG hole = new Cylinder(positionStart, positionEnd, SCREW_HOLE_RADIUS,NUM_SLICES).toCSG();
-           screwHoles = Optional.ofNullable(screwHoles).map(e -> e.union(hole)).orElse(hole);
-        }
-        return List.of(screwHoles);
+        return Arrays.stream(SCREW_HOLE_POSITIONS)
+                .map(start ->  new Cylinder(start, start.plus(0,0,dimensions.z()), SCREW_HOLE_RADIUS,NUM_SLICES).toCSG())
+                .collect(Collectors.toList());
     }
 
     private static  CSG getSwitchCutout(Vector3d center, Vector3d dimensions) {
