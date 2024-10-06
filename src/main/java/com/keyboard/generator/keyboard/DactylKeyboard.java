@@ -66,8 +66,7 @@ public class DactylKeyboard {
         CSG bottom = bottomPlate.createBottomPlate();
         keyboard = keyboard.union(bottom);
 
-        //return keyboard;
-        return switchPlate.getPlate();
+        return keyboard;
     }
 
     public void saveModel(String filename) {
