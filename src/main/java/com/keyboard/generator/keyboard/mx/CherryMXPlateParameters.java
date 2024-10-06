@@ -6,6 +6,9 @@ public class CherryMXPlateParameters {
     public static final double PLATE_WIDTH = 24.0;
     public static final double PLATE_HEIGHT = 24.0;
     public static final double PLATE_THICKNESS = 1.5;
+    public static final int NUM_SLICES = 60;
+
+
 
     public static final double SWITCH_CUTOUT_SIZE = 14.0;
 
