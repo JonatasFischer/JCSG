@@ -2,6 +2,7 @@ package com.keyboard.generator.keyboard;
 
 import com.keyboard.generator.keyboard.keys.KeyCap;
 import com.keyboard.generator.keyboard.keys.KeySwitch;
+import com.keyboard.generator.keyboard.mx.CherryMXSwitchPlate;
 import eu.mihosoft.jcsg.CSG;
 import eu.mihosoft.jcsg.Cube;
 import eu.mihosoft.jcsg.FileUtil;
@@ -31,18 +32,21 @@ public class DactylKeyboard {
     public CSG buildKeyboard() {
         CSG keyboard = new Cube(0, 0, 0).toCSG();
 
-        // Build key switches and caps
+        // Create an instance of the Cherry MX switch plate
+        CherryMXSwitchPlate switchPlate = new CherryMXSwitchPlate();
+        CSG plateModel = switchPlate.getPlate();
+
+        // Iterate over key positions
         for (int column : params.COLUMNS) {
             for (int row : params.ROWS) {
                 if (!(column == 0 && row == 4)) {
-                    CSG switchHole = keySwitch.createSwitchHole();
-                    CSG cap = keyCap.createKeyCap(1.0);
+                    // Apply the key placement transformation
                     Transform transform = placementFunctions.keyPlace(column, row);
 
-                    CSG placedSwitch = switchHole.transformed(transform);
-                    CSG placedCap = cap.transformed(transform);
+                    // Place the switch plate
+                    CSG placedPlate = plateModel.transformed(transform);
 
-                    keyboard = keyboard.union(placedSwitch).union(placedCap);
+                    keyboard = keyboard.union(placedPlate);
                 }
             }
         }
@@ -62,7 +66,8 @@ public class DactylKeyboard {
         CSG bottom = bottomPlate.createBottomPlate();
         keyboard = keyboard.union(bottom);
 
-        return keyboard;
+        //return keyboard;
+        return switchPlate.getPlate();
     }
 
     public void saveModel(String filename) {
