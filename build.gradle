@@ -2,9 +2,10 @@ plugins {
     id 'application'
     id 'java'
     id 'maven-publish'
-    id 'org.openjfx.javafxplugin' version '0.0.7'
-    //id 'net.nemerosa.versioning' version '2.8.2'
-    id 'com.jfrog.bintray' version '1.8.4'
+    id 'org.openjfx.javafxplugin' version '0.0.14'
+    //id 'net.nemerosa.versioning' version '2.14.0'
+    // Remove the Bintray plugin
+    // id 'com.jfrog.bintray' version '1.8.5'
 }
 
 sourceCompatibility = '11'
@@ -14,7 +15,7 @@ sourceCompatibility = '11'
 //repairHeaders.licenseHeaderText = new File(projectDir,'./license-template.txt')
 
 wrapper {
-    gradleVersion = '6.4'
+    gradleVersion = '8.2'
 }
 
 if (!hasProperty('mainClass')) {
@@ -27,7 +28,6 @@ mainClassName = mainClass
 repositories {
     mavenCentral()
     jcenter()
-    
     mavenLocal()
 }
 
@@ -42,7 +42,6 @@ if (JavaVersion.current().isJava8Compatible()) {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
@@ -60,14 +59,10 @@ artifacts {
 }
 
 dependencies {
-    
-    testCompile group: 'junit', name: 'junit', version: '4.+'
-
-   // compile group: 'eu.mihosoft.ext.org.fxyz', name: 'extfxyz', version: '0.4'
-    //compile group: 'eu.mihosoft.ext.org.fxyz', name: 'extfxyz', version: '0.4', classifier: 'sources'
-    compile group: 'eu.mihosoft.vvecmath', name: 'vvecmath', version: '0.3.8'
-    compile group: 'eu.mihosoft.vvecmath', name: 'vvecmath', version: '0.3.8', classifier: 'sources'
-    compile 'org.slf4j:slf4j-simple:1.6.1'
+    testImplementation group: 'junit', name: 'junit', version: '4.+'
+    implementation group: 'eu.mihosoft.vvecmath', name: 'vvecmath', version: '0.3.8'
+    implementation group: 'eu.mihosoft.vvecmath', name: 'vvecmath', version: '0.3.8', classifier: 'sources'
+    implementation 'org.slf4j:slf4j-simple:1.6.1'
 }
 
 Date buildTimeAndDate = new Date()
@@ -79,30 +74,27 @@ ext {
 // create a fat-jar (class files plus dependencies
 // excludes VRL.jar (plugin jar files must not start with 'vrl-\\d+')
 jar {
-
-
     // TODO add switch for fat-jar generation
     // dependencies except VRL
-    // from configurations.runtime.asFileTree.
+    // from configurations.runtimeClasspath.asFileTree.
     //     filter({file->return !file.name.startsWith("vrl-0")}).
     //     files.collect { zipTree(it) }
-    // 
+    //
     // // project class files compiled from source
     // from files(sourceSets.main.output)
-    
+
     manifest {
-    
         attributes(
-          'Built-By': System.properties['user.name'],
-          'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
-          'Build-Date': project.buildDate,
-          'Build-Time': project.buildTime,
-          //'Build-Revision': versioning.info.commit,
-          'Specification-Title': project.name,
-          'Specification-Version': project.version,
-          'Implementation-Title': project.name,
-          'Implementation-Version': project.version,
-          'Automatic-Module-Name': "eu.mihosoft.jcsg"
+                'Built-By': System.properties['user.name'],
+                'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
+                'Build-Date': project.buildDate,
+                'Build-Time': project.buildTime,
+                //'Build-Revision': versioning.info.commit,
+                'Specification-Title': project.name,
+                'Specification-Version': project.version,
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Automatic-Module-Name': "eu.mihosoft.jcsg"
         )
     }
 }
@@ -114,7 +106,6 @@ javafx {
 test {
     maxHeapSize = '2G'
 }
-
 
 def pomConfig = {
     name 'jcsg'
@@ -155,25 +146,14 @@ publishing {
             }
         }
     }
-}
-
-if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
-if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = ''
-
-bintray {
-    user = project.bintrayUsername
-    key = project.bintrayApiKey
-    publications = ['mavenCustom']
-    pkg {
-        repo                  = 'JCSG'
-        userOrg               = 'miho'
-        name                  = project.name
-        desc                  = 'Java implementation of BSP based CSG (Constructive Solid Geometry)'
-        licenses              = ['BSD 2-Clause']
-        labels                = ['javafx', 'java',  'CSG', 'Constructive Solid Geometry',  'VRL',  '3D',  'STL',  'OBJ']
-        websiteUrl            = 'https://github.com/miho/JCSG/wiki'
-        issueTrackerUrl       = 'https://github.com/miho/JCSG/issues'
-        vcsUrl                = 'git@github.com:miho/JCSG.git'
-        publicDownloadNumbers = true
+    repositories {
+        maven {
+            name = "MavenCentral"
+            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = project.findProperty("ossrhUsername") ?: ""
+                password = project.findProperty("ossrhPassword") ?: ""
+            }
+        }
     }
 }
