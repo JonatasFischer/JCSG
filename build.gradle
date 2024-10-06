@@ -2,13 +2,13 @@ plugins {
     id 'application'
     id 'java'
     id 'maven-publish'
-    id 'org.openjfx.javafxplugin' version '0.0.14'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
     //id 'net.nemerosa.versioning' version '2.14.0'
     // Remove the Bintray plugin
     // id 'com.jfrog.bintray' version '1.8.5'
 }
 
-sourceCompatibility = '11'
+sourceCompatibility = '13'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 //apply from: 'http://gradle-plugins.mihosoft.eu/latest/vlicenseheader.gradle'
@@ -63,6 +63,7 @@ dependencies {
     implementation group: 'eu.mihosoft.vvecmath', name: 'vvecmath', version: '0.3.8'
     implementation group: 'eu.mihosoft.vvecmath', name: 'vvecmath', version: '0.3.8', classifier: 'sources'
     implementation 'org.slf4j:slf4j-simple:1.6.1'
+    implementation files('libs/jimStlMeshImporterJFX.jar')
 }
 
 Date buildTimeAndDate = new Date()
@@ -100,6 +101,7 @@ jar {
 }
 
 javafx {
+    version = "17.0.2" // Match your JDK version
     modules = [ 'javafx.graphics', 'javafx.fxml']
 }
 
