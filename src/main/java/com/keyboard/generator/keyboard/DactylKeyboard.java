@@ -1,5 +1,7 @@
 package com.keyboard.generator.keyboard;
 
+import com.keyboard.generator.keyboard.keys.KeyCap;
+import com.keyboard.generator.keyboard.keys.KeySwitch;
 import eu.mihosoft.jcsg.CSG;
 import eu.mihosoft.jcsg.Cube;
 import eu.mihosoft.jcsg.FileUtil;

@@ -1,6 +1,7 @@
-package com.keyboard.generator.keyboard;
+package com.keyboard.generator.keyboard.keys;
 
 
+import com.keyboard.generator.keyboard.DactylParameters;
 import eu.mihosoft.jcsg.CSG;
 import eu.mihosoft.jcsg.Cube;
 import eu.mihosoft.vvecmath.Transform;

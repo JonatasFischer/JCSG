@@ -1,6 +1,7 @@
-package com.keyboard.generator.keyboard;
+package com.keyboard.generator.keyboard.keys;
 
 
+import com.keyboard.generator.keyboard.DactylParameters;
 import eu.mihosoft.jcsg.CSG;
 import eu.mihosoft.jcsg.Cube;
 import eu.mihosoft.jcsg.Sphere;
@@ -34,7 +35,7 @@ public class KeyCap {
                         .translate(0, 0, height * 0.75));
 
         // Combine base and top
-        CSG keycap = base.union(top);
+        CSG keycap = base.difference(top);
 
         // Adjust the position relative to the plate
         keycap = keycap.transformed(Transform.unity().translateZ(params.PLATE_THICKNESS));
