@@ -7,60 +7,64 @@ import eu.mihosoft.vvecmath.Transform;
 
 public class DactylKeyboard {
     private DactylParameters params;
-    private SwitchHole switchHole;
-    private KeyPlacement keyPlacement;
+    private KeySwitch keySwitch;
+    private KeyCap keyCap;
+    private PlacementFunctions placementFunctions;
+    private WebConnectors webConnectors;
     private ThumbCluster thumbCluster;
-    private Case keyboardCase;
+    private CaseWalls caseWalls;
+    private BottomPlate bottomPlate;
 
     public DactylKeyboard() {
         this.params = new DactylParameters();
-        this.switchHole = new SwitchHole(params);
-        this.keyPlacement = new KeyPlacement(params);
-        this.thumbCluster = new ThumbCluster(params);
-        this.keyboardCase = new Case(params);
+        this.keySwitch = new KeySwitch(params);
+        this.keyCap = new KeyCap(params);
+        this.placementFunctions = new PlacementFunctions(params);
+        this.webConnectors = new WebConnectors(params);
+        this.thumbCluster = new ThumbCluster(params, placementFunctions);
+        this.caseWalls = new CaseWalls(params, placementFunctions);
+        this.bottomPlate = new BottomPlate(params, placementFunctions);
     }
 
-    public CSG build() {
-        CSG switchHoleModel = switchHole.create();
-        CSG keyPlate = new Cube(0, 0, 0).toCSG(); // Inicia com um modelo vazio
+    public CSG buildKeyboard() {
+        CSG keyboard = new Cube(0, 0, 0).toCSG();
 
-        // Adiciona os buracos dos switches
+        // Build key switches and caps
         for (int column : params.COLUMNS) {
             for (int row : params.ROWS) {
                 if (!(column == 0 && row == 4)) {
-                    CSG key = keyPlacement.placeKey(column, row, switchHoleModel);
-                    keyPlate = keyPlate.union(key);
+                    CSG switchHole = keySwitch.createSwitchHole();
+                    CSG cap = keyCap.createKeyCap(1.0);
+                    Transform transform = placementFunctions.keyPlace(column, row);
+
+                    CSG placedSwitch = switchHole.transformed(transform);
+                    CSG placedCap = cap.transformed(transform);
+
+                    keyboard = keyboard.union(placedSwitch).union(placedCap);
                 }
             }
         }
 
-        // Adiciona o cluster do polegar
-        CSG[] thumbKeys = thumbCluster.create(switchHoleModel);
-        for (CSG key : thumbKeys) {
-            keyPlate = keyPlate.union(key);
-        }
+        // Add thumb cluster
+        CSG thumb = thumbCluster.createThumbCluster(keySwitch.createSwitchHole(), keyCap.createKeyCap(1.0));
+        keyboard = keyboard.union(thumb);
 
-        // Cria a placa base
-        double plateThickness = params.KEYSWITCH_THICKNESS;
-        double plateWidth = 200.0;
-        double plateDepth = 200.0;
+        // Add web connectors (simplified)
+        // You can expand this to match the original code's complexity
 
-        CSG plate = new Cube(plateWidth, plateDepth, plateThickness)
-                .toCSG()
-                .transformed(Transform.unity()
-                        .translate(-plateWidth / 2, -plateDepth / 2, plateThickness / 2 + params.PLATE_HEIGHT));
+        // Add case walls
+        CSG frontWall = caseWalls.createFrontWall();
+        keyboard = keyboard.union(frontWall);
 
-        // Subtrai os buracos dos switches da placa
-        plate = plate.difference(keyPlate);
+        // Add bottom plate
+        CSG bottom = bottomPlate.createBottomPlate();
+        keyboard = keyboard.union(bottom);
 
-        // Cria a carcaça
-        CSG keyboardCaseModel = keyboardCase.create(plate);
-
-        return keyboardCaseModel;
+        return keyboard;
     }
 
     public void saveModel(String filename) {
-        CSG model = build();
+        CSG model = buildKeyboard();
         try {
             FileUtil.write(new java.io.File(filename).toPath(), model.toStlString());
         } catch (java.io.IOException e) {
@@ -68,4 +72,3 @@ public class DactylKeyboard {
         }
     }
 }
-
